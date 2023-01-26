@@ -54,7 +54,8 @@ class SerialNetworkLink():
                 try:
                     self.connected.send(outgoing)
                 except:
-                    self.Close()
+                    self.Reopen()
+                    break
             try:
                 r,_,_ = select.select([self.socket],[],[],0.01)
 
@@ -64,13 +65,21 @@ class SerialNetworkLink():
                         #print(f'Recieved: {incoming}')
                         self.serial_connection.write(incoming)
             except:
-                self.Close()
+                self.Reopen()
+                break
+
 
     def Close(self):
         self.connected.close()
         self.socket.close()
         self.serial_connection.close()
         print(f'[{self.link_name}] Closed')
+
+    def Reopen(self):
+        self.Close()
+        time.sleep(5)
+        self.Connect()
+
 
 def main():
     connected = 0
