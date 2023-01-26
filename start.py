@@ -22,19 +22,19 @@ class SerialNetworkLink():
     def Connect(self):
         self.serial_connection = Serial(self.serial_port_name,  baudrate=115200, write_timeout=10)
         print(f'[{self.link_name}] Serial port:{self.serial_port_name} linked to Socket port:{self.socket_port_number}')
-
+        
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         print(self.socket_port_number)
         self.socket.bind((HOST, self.socket_port_number))
         #self.socket = socket.create_server((HOST, self.socket_port_number))
         self.connect_thread = threading.Thread(target=self.AwaitConnection, args=())
-        self.connect_thread.start()
+        self.connect_thread.start()    
 
 
     def AwaitConnection(self):
-        self.socket.listen(1)
-        print(f'[{self.link_name}] Awaiting socket connection...')
+        self.socket.listen(1) 
+        print(f'[{self.link_name}] Awaiting socket connection...')   
 
         self.connected, self.address = self.socket.accept()
 
@@ -45,7 +45,7 @@ class SerialNetworkLink():
 
     def Transmit(self):
         while self.serial_connection.is_open:
-            if time.time() - self.last_ping > PING_DELAY:
+            if time.time() - self.last_ping > PING_DELAY: 
                print(f'[{self.link_name}] Alive!')
                self.last_ping = time.time()
             outgoing = self.serial_connection.read_all()
@@ -63,7 +63,7 @@ class SerialNetworkLink():
                     incoming = self.connected.recv(1024)
                     if len(incoming) > 0:
                         #print(f'Recieved: {incoming}')
-                        self.serial_connection.write(incoming)
+                        self.serial_connection.write(incoming)      
             except:
                 self.Reopen()
                 break
@@ -81,7 +81,7 @@ class SerialNetworkLink():
         self.Connect()
 
 
-def main():
+def main(args):
     connected = 0
     serial_ports = list(list_ports.comports())
     i = 0
@@ -96,7 +96,11 @@ def main():
         link.Connect()
 
 
-# import argparse
-# args = parser.parse_args()
+import argparse
+
+parser = argparse.ArgumentParser(description='Link serial controllers over sockets')
+#parser.add_argument('-sp', type=int, default=54321, help='Starting port number')
+args = parser.parse_args()
+
 if __name__ == '__main__':
-    main()
+    main(args)
