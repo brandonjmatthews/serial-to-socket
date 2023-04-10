@@ -29,6 +29,7 @@ class SerialNetworkLink():
         self.socket = socket.socket(socket.AF_INET)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind((HOST, self.socket_port_number))
+        self.socket.listen(1)
         #self.socket = socket.create_server((HOST, self.socket_port_number))
         self.connect_thread = threading.Thread(target=self.AwaitConnection, args=())
         self.connect_thread.start()    
